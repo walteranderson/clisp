@@ -49,6 +49,23 @@ const char* atom_kind_to_string(AtomKind kind)
     }
 }
 
+Expr create_atom_expr(Atom* atom)
+{
+    Expr expr = {
+        .kind = EXPR_ATOM,
+        .atom = atom,
+    };
+    return expr;
+}
+
+Expr create_void_expr()
+{
+    Expr expr = {
+        .kind = EXPR_VOID
+    };
+    return expr;
+}
+
 Atom* create_symbol_atom(const char* begin, const char* end)
 {
     Atom* atom = malloc(sizeof(Atom));
@@ -103,11 +120,22 @@ Atom* create_string_atom(const char* begin, const char* end)
     return atom;
 }
 
-Expr create_atom_expr(Atom* atom)
+Cons* create_cons(Expr car, Expr cdr)
+{
+    Cons* cons = malloc(sizeof(Cons));
+    if (cons == NULL) {
+        return NULL;
+    }
+    cons->car = car;
+    cons->cdr = cdr;
+    return cons;
+}
+
+Expr create_cons_expr(Cons* cons)
 {
     Expr expr = {
-        .kind = EXPR_ATOM,
-        .atom = atom,
+        .kind = EXPR_CONS,
+        .cons = cons,
     };
     return expr;
 }

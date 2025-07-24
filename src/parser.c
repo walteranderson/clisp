@@ -73,12 +73,31 @@ ParseResult parse_string(Token token)
 
 ParseResult parse_list(Token token)
 {
+    if (*token.begin != '(') {
+        return parse_error("Expected (", token.end);
+    }
+
     token = next_token(token.end);
     if (*token.begin == ')') {
         return parse_success(
             create_atom_expr(create_symbol_atom("nil", NULL)),
             token.end);
     }
+
+    ParseResult car = parse_expr(token);
+    if (car.is_error == true) {
+        return car;
+    }
+
+    // Cons* cons = create_cons(car.expr, create_void_expr());
+    // token = next_token(car.end);
+    // while (*token.begin != 0 || *token.begin != ')') {
+    //     car = parse_expr(token);
+    //     if (car.is_error) {
+    //         return car;
+    //     }
+    //     //
+    // }
 
     return parse_error("TODO: parse_list not implemented", 0);
 }

@@ -89,17 +89,27 @@ ParseResult parse_list(Token token)
         return car;
     }
 
-    // Cons* cons = create_cons(car.expr, create_void_expr());
-    // token = next_token(car.end);
-    // while (*token.begin != 0 || *token.begin != ')') {
-    //     car = parse_expr(token);
-    //     if (car.is_error) {
-    //         return car;
-    //     }
-    //     //
-    // }
+    Cons* list = create_cons(car.expr, create_void_expr());
+    Cons* cons = list;
+    token = next_token(car.end);
+    while (*token.begin != 0 && *token.begin != ')') {
+        car = parse_expr(token);
+        if (car.is_error) {
+            return car;
+        }
+        cons->cdr = create_cons_expr(create_cons(car.expr, create_void_expr()));
+        cons = cons->cdr.cons;
+        token = next_token(car.end);
+    }
 
-    return parse_error("TODO: parse_list not implemented", 0);
+    ParseResult cdr = parse_success(create_atom_expr(create_symbol_atom("nil", NULL)), token.end);
+    if (cdr.is_error) {
+        return cdr;
+    }
+
+    cons->cdr = cdr.expr;
+
+    return parse_success(create_cons_expr(list), cdr.end);
 }
 
 ParseResult parse_expr(Token token)

@@ -56,7 +56,7 @@ Atom* create_symbol_atom(const char* begin, const char* end)
         return NULL;
     }
 
-    size_t length = end - begin;
+    size_t length = end == NULL ? strlen(begin) : end - begin;
     char* str = (char*)malloc(length + 1);
     if (str == NULL) {
         free(atom);

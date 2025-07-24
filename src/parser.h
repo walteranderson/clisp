@@ -8,6 +8,7 @@
 
 typedef struct {
     bool is_error;
+    const char* end;
     union {
         Expr expr;
         const char* error;

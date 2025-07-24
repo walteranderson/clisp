@@ -16,7 +16,7 @@ void eval_input(const char* input)
         if (result.is_error == true) {
             return;
         }
-        token = next_token(token.end);
+        token = next_token(result.end);
     } while (true);
 }
 

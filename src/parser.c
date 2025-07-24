@@ -27,19 +27,21 @@ void print_parse_result(ParseResult result)
     }
 }
 
-static ParseResult parse_error(const char* msg)
+static ParseResult parse_error(const char* msg, const char* end)
 {
     ParseResult result = {
         .is_error = true,
+        .end = end,
         .error = msg,
     };
     return result;
 }
 
-static ParseResult parse_success(Expr expr)
+static ParseResult parse_success(Expr expr, const char* end)
 {
     ParseResult result = {
         .is_error = false,
+        .end = end,
         .expr = expr,
     };
     return result;
@@ -48,7 +50,7 @@ static ParseResult parse_success(Expr expr)
 ParseResult parse_symbol(Token token)
 {
     Atom* atom = create_symbol_atom(token.begin, token.end);
-    return parse_success(create_atom_expr(atom));
+    return parse_success(create_atom_expr(atom), token.end);
 }
 
 ParseResult parse_int(Token token)
@@ -56,29 +58,34 @@ ParseResult parse_int(Token token)
     char* endptr = 0;
     long int x = strtol(token.begin, &endptr, 10);
     Atom* atom = create_int_atom(x);
-    return parse_success(create_atom_expr(atom));
+    return parse_success(create_atom_expr(atom), token.end);
 }
 
 ParseResult parse_string(Token token)
 {
     if (*(token.end - 1) != '"') {
-        return parse_error("Missing closing quote");
+        return parse_error("Missing closing quote", token.end);
     }
 
     Atom* atom = create_string_atom(token.begin + 1, token.end - 1);
-    return parse_success(create_atom_expr(atom));
+    return parse_success(create_atom_expr(atom), token.end);
 }
 
 ParseResult parse_list(Token token)
 {
-    (void)token;
-    return parse_error("TODO: parse_list not implemented");
+    token = next_token(token.end);
+    if (*token.begin == ')') {
+        return parse_success(
+            create_atom_expr(create_symbol_atom("nil", NULL)), token.end);
+    }
+
+    return parse_error("TODO: parse_list not implemented", 0);
 }
 
 ParseResult parse_expr(Token token)
 {
     if (*token.begin == 0) {
-        return parse_error("EOF");
+        return parse_error("EOF", 0);
     }
 
     switch (*token.begin) {

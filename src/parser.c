@@ -76,7 +76,8 @@ ParseResult parse_list(Token token)
     token = next_token(token.end);
     if (*token.begin == ')') {
         return parse_success(
-            create_atom_expr(create_symbol_atom("nil", NULL)), token.end);
+            create_atom_expr(create_symbol_atom("nil", NULL)),
+            token.end);
     }
 
     return parse_error("TODO: parse_list not implemented", 0);

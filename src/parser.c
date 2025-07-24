@@ -7,24 +7,29 @@
 #include "parser.h"
 #include "tokenizer.h"
 
+void print_expr(Expr expr)
+{
+    switch (expr.kind) {
+    case EXPR_ATOM: {
+        print_atom(expr.atom);
+    } break;
+    case EXPR_CONS: {
+        print_expr(expr.cons->car);
+        print_expr(expr.cons->cdr);
+    } break;
+    case EXPR_VOID: {
+        printf("void\n");
+    } break;
+    }
+}
+
 void print_parse_result(ParseResult result)
 {
     if (result.is_error == true) {
         printf("ERROR: %s\n", result.error);
         return;
     }
-
-    switch (result.expr.kind) {
-    case EXPR_ATOM: {
-        print_atom(result.expr.atom);
-    } break;
-    case EXPR_CONS: {
-        printf("expr_cons: TODO\n");
-    } break;
-    case EXPR_VOID: {
-        printf("void\n");
-    } break;
-    }
+    print_expr(result.expr);
 }
 
 static ParseResult parse_error(const char* msg, const char* end)

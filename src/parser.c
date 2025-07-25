@@ -76,6 +76,27 @@ ParseResult parse_string(Token token)
     return parse_success(create_atom_expr(atom), token.end);
 }
 
+ParseResult parse_cdr(Token token)
+{
+    if (*token.begin != '.') {
+        return parse_error("Expected .", token.end);
+    }
+
+    token = next_token(token.end);
+    ParseResult cdr = parse_expr(token);
+    if (cdr.is_error == true) {
+        return cdr;
+    }
+
+    token = next_token(token.end);
+    printf("tok: %c\n", *token.begin);
+    if (*token.begin != ')') {
+        return parse_error("Expected )", token.end);
+    }
+
+    return parse_success(cdr.expr, token.end);
+}
+
 ParseResult parse_list(Token token)
 {
     if (*token.begin != '(') {
@@ -97,7 +118,7 @@ ParseResult parse_list(Token token)
     Cons* list = create_cons(car.expr, create_void_expr());
     Cons* cons = list;
     token = next_token(car.end);
-    while (*token.begin != 0 && *token.begin != ')') {
+    while (*token.begin != 0 && *token.begin != '.' && *token.begin != ')') {
         car = parse_expr(token);
         if (car.is_error) {
             return car;
@@ -107,7 +128,9 @@ ParseResult parse_list(Token token)
         token = next_token(car.end);
     }
 
-    ParseResult cdr = parse_success(create_atom_expr(create_symbol_atom("nil", NULL)), token.end);
+    ParseResult cdr = *token.begin == '.'
+        ? parse_cdr(token)
+        : parse_success(create_atom_expr(create_symbol_atom("nil", NULL)), token.end);
     if (cdr.is_error) {
         return cdr;
     }

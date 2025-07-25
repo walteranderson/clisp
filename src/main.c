@@ -14,7 +14,7 @@ void eval_input(const char* input)
         ParseResult result = parse_expr(token);
         print_parse_result(result);
         if (result.is_error == true) {
-            return;
+            break;
         }
         token = next_token(result.end);
     } while (true);
